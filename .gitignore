@@ -1,0 +1,17 @@
+# The public repository contains reproducible CODE and selected validated outputs,
+# not original ~360 MB BTS archives or cached/large intermediate files.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.env
+.DS_Store
+*.part
+*.log
+output/
+data/raw/
+data/processed/
+.streamlit/secrets.toml
+*.egg-info/
+build/
+dist/

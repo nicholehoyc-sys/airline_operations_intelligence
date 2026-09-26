@@ -1,0 +1,111 @@
+{
+  "period": "ltm_2026",
+  "start": "2025-08-01",
+  "end": "2026-07-31",
+  "source": "Reporting Carrier On-Time Performance (1987-present)",
+  "geography": "US domestic reporting-carrier records, nationwide",
+  "completeness": "all 12 archives required",
+  "archives": [
+    {
+      "filename": "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_8.zip",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_8.zip",
+      "sha256": "405668b8a807266236a635efbc1e9364abfb756db1a5c895e45abc9c7b7684f1",
+      "rows": 602378
+    },
+    {
+      "filename": "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_9.zip",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_9.zip",
+      "sha256": "adc722b1c14944451b20ddcdbeec69bbc092310ab8044f758b8f4b82fde8d017",
+      "rows": 562439
+    },
+    {
+      "filename": "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_10.zip",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_10.zip",
+      "sha256": "05d14d3fd67fa3e04b97c4d6bc7386f4a6c1cda13d2506cf0e9f0a6c620ed111",
+      "rows": 605844
+    },
+    {
+      "filename": "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_11.zip",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_11.zip",
+      "sha256": "6d5b68eea3ebb25f3cb2843e701a6c809b5455301b3bbd7802a20d522ed770c8",
+      "rows": 570550
+    },
+    {
+      "filename": "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_12.zip",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2025_12.zip",
+      "sha256": "a2af96d186bc9997fef47382b8589198281c9a722286d88f30032af8ee7dcd0f",
+      "rows": 582304
+    },
+    {
+      "filename": "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_1.zip",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_1.zip",
+      "sha256": "9ff58f560519dbc8fbd1b8b9fd2a172ca46d0a9e80f1df4fd48891efca41e89c",
+      "rows": 544003
+    },
+    {
+      "filename": "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_2.zip",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_2.zip",
+      "sha256": "a18b6de822a63bb881b55983ef039bf02a7cac046e9624e5c1b19b470a5e05cb",
+      "rows": 515037
+    },
+    {
+      "filename": "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_3.zip",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_3.zip",
+      "sha256": "c0864d5dabd522517976e29bb81f0c094d114e3e0e40cd51bc5a238ae4292b9d",
+      "rows": 612102
+    },
+    {
+      "filename": "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_4.zip",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_4.zip",
+      "sha256": "70e685ffa6042e6c851c4f1e821d774dfe7318d3eb212ac5bfc6a53ea23f3cfb",
+      "rows": 597919
+    },
+    {
+      "filename": "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_5.zip",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_5.zip",
+      "sha256": "4e7b96999440afec8c92dd23bfbc68a5852e14d9a56c3d0d366f884542ea80b3",
+      "rows": 611735
+    },
+    {
+      "filename": "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_6.zip",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_6.zip",
+      "sha256": "acd9d03e223e079e54b77065015f0ce9b6de92f1f46148048600cc9813a47a6e",
+      "rows": 607577
+    },
+    {
+      "filename": "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_7.zip",
+      "url": "https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_2026_7.zip",
+      "sha256": "61d657eb17f5b6f800ed2f05262a2223c5edf66fe7d9cfb3598c6664a34ed0b6",
+      "rows": 631970
+    }
+  ],
+  "on_time_definition": "arr_delay < 15 minutes; excluded cancelled/diverted and missing delay from rate denominator",
+  "scheduled_rows": 7043858,
+  "operated_rows": 6915477,
+  "calendar_days_per_month": {
+    "2025-08": 31,
+    "2025-09": 30,
+    "2025-10": 31,
+    "2025-11": 30,
+    "2025-12": 31,
+    "2026-01": 31,
+    "2026-02": 28,
+    "2026-03": 31,
+    "2026-04": 30,
+    "2026-05": 31,
+    "2026-06": 30,
+    "2026-07": 31
+  },
+  "carrier_count": 14,
+  "observed_carrier_tail_pairs": 6390,
+  "dea_eligible_carriers": 12,
+  "method_note": "Domestic flight records; observed tails are not inventory; no spare capacity, redeployment or maintenance recommendations.",
+  "model_interpretation": "DEA model-dependent observed frequency and network tradeoffs; not overall operational efficiency or feasible peer prescriptions.",
+  "dea_sensitivity_models": [
+    "baseline",
+    "block_hours_exposure",
+    "network_as_output",
+    "volume_only"
+  ],
+  "analysis_scope": "Descriptive domestic aircraft activity and model-dependent CCR DEA; no aircraft actionability classification"
+}
