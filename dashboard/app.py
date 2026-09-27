@@ -27,7 +27,7 @@ st.set_page_config(page_title="Airline Operations Intelligence", layout="wide")
 def load_data() -> dict:
     return DashboardDataService(ROOT).load()
 
-
+# Display names for columns in the dashboard tables
 DISPLAY_NAMES = {
     "carrier": "Carrier",
     "carrier_name": "Carrier name",
@@ -48,6 +48,40 @@ DISPLAY_NAMES = {
     "model_score_range": "Score range across models",
     "dea_eligible": "Included in DEA",
     "dea_exclusion_reason": "Exclusion reason",
+
+    # DEA model names shown in the sensitivity table
+    "baseline": "Core benchmark",
+    "volume_only": "Flight volume",
+    "network_as_output": "Network reach",
+    "block_hours_exposure": "Flying hours",
+}
+
+
+# Short labels shown in the benchmarking dropdown.
+SPEC_LABELS = {
+    "baseline": "Core benchmark",
+    "volume_only": "Flight volume",
+    "network_as_output": "Network reach",
+    "block_hours_exposure": "Flying hours",
+}
+
+# Plain-English explanation shown below the selected benchmark.
+SPEC_EXPLANATIONS = {
+    "baseline":
+        "Compares observed aircraft and destinations served with "
+        "flights operated and on-time arrivals.",
+
+    "volume_only":
+        "Compares observed aircraft and destinations served with "
+        "the number of flights operated.",
+
+    "network_as_output":
+        "Treats destinations served as part of the airline's output, "
+        "alongside flights operated.",
+
+    "block_hours_exposure":
+        "Compares observed aircraft and destinations served with "
+        "recorded domestic flying hours.",
 }
 
 
@@ -57,24 +91,12 @@ def table(frame: pd.DataFrame, columns: list[str]) -> None:
     st.dataframe(
         display,
         hide_index=True,
-        use_container_width=True,
+        width="stretch",
     )
 
 
 def production_description(spec: str) -> str:
-    return {
-        "baseline":
-            "Core benchmark — fleet + network size vs. flights + on-time operations",
-
-        "volume_only":
-            "Flight volume — fleet + network size vs. flights operated",
-
-        "network_as_output":
-            "Network reach — fleet size vs. flights + destinations served",
-
-        "block_hours_exposure":
-            "Flying activity — fleet + network size vs. domestic flying hours",
-    }[spec]
+    return SPEC_LABELS[spec]
 
 st.title("Airline Operations Intelligence")
 st.caption("Benchmarking U.S. airline operating efficiency and fleet activity "
@@ -103,7 +125,10 @@ for frame in (carrier, ranking, sensitivity, summary):
 
 stats = st.columns(4)
 stats[0].metric("Scheduled flights", f"{manifest['scheduled_rows']:,}")
+stats[0].metric("Scheduled flights", f"{manifest['scheduled_rows']:,}")
 stats[1].metric("Flights operated", f"{manifest['operated_rows']:,}")
+stats[2].metric("Carriers in dataset / DEA benchmark", f"{manifest['carrier_count']} / {manifest['dea_eligible_carriers']}")
+stats[3].metric("Observed aircraft records", f"{len(aircraft):,}")
 stats[2].metric("Carriers in dataset / DEA benchmark", f"{manifest['carrier_count']} / {manifest['dea_eligible_carriers']}")
 stats[3].metric("Observed aircraft records", f"{len(aircraft):,}")
 
@@ -115,7 +140,7 @@ with benchmark:
         "How efficiently do carriers convert operating resources into flight activity?" )
 
     st.write(
-        "DEA benchmarks each carrier against the strongest-performing combinations "
+        "DEA compares each carrier with the strongest observed operating combinations in the peer group. "
         "of carriers in the dataset. A higher score indicates stronger relative "
         "performance under the selected operating assumptions.")
 
@@ -137,6 +162,10 @@ with benchmark:
         specs,
         format_func=production_description, )
 
+    st.caption(
+        SPEC_EXPLANATIONS[spec]
+    )
+
     selected = (
         sensitivity.loc[sensitivity.specification.eq(spec)]
         .sort_values("efficiency", ascending=False) )
@@ -155,13 +184,33 @@ with benchmark:
                 "carrier": "Carrier",
                 "efficiency": "Relative efficiency score",},
             title="Relative operating efficiency by carrier", ),
-        use_container_width=True,
+        width="stretch",
     )
 
     st.caption(
         "Higher scores indicate stronger performance relative to the peer group "
         "under the selected assumptions. Changing what the model treats as an "
         "input or output can materially change carrier scores."   )
+
+    selected = selected.copy()
+
+    selected["input_variables"] = selected["input_variables"].replace({
+        "observed_aircraft,distinct_destinations":
+            "Observed aircraft; destinations served",
+        "observed_aircraft":
+            "Observed aircraft",
+    })
+
+    selected["output_variables"] = selected["output_variables"].replace({
+        "operated_flights,on_time_arrivals":
+            "Flights operated; on-time arrivals",
+        "operated_flights":
+            "Flights operated",
+        "operated_flights,distinct_destinations":
+            "Flights operated; destinations served",
+        "recorded_block_minutes":
+            "Domestic flying hours",
+    })
 
     # Show the underlying model variables for users who want more detail.
     table(
@@ -206,17 +255,39 @@ with benchmark:
     "DEA results depend on what the model treats as a resource versus an output. "
     "Comparing alternative specifications shows which carrier conclusions are "
     "robust and which are highly assumption-dependent.")
-    pivot = sensitivity.pivot(index="carrier", columns="specification", values="efficiency").reset_index()
-    pivot.insert(1, "carrier_name", pivot["carrier"].map(CARRIER_NAMES).fillna(""))
-    pivot["model_score_range"] = pivot[specs].max(axis=1) - pivot[specs].min(axis=1)
-    pivot = pivot.rename(
-    columns={
-        "baseline": "Core benchmark",
-        "volume_only": "Flight volume",
-        "network_as_output": "Network reach",
-        "block_hours_exposure": "Flying activity", }
+    pivot = (
+        sensitivity
+        .pivot(
+            index="carrier",
+            columns="specification",
+            values="efficiency",
+        )
+        .reset_index()
     )
-    table(pivot.sort_values("model_score_range", ascending=False), ["carrier", "carrier_name", *specs, "model_score_range"])
+
+    pivot.insert(
+        1,
+        "carrier_name",
+        pivot["carrier"].map(CARRIER_NAMES).fillna(""),
+    )
+
+    pivot["model_score_range"] = (
+        pivot[specs].max(axis=1)
+        - pivot[specs].min(axis=1)
+    )
+
+    table(
+        pivot.sort_values(
+            "model_score_range",
+            ascending=False,
+        ),
+        [
+            "carrier",
+            "carrier_name",
+            *specs,
+            "model_score_range",
+        ],
+    )
     st.caption("A larger range means the carrier's relative position is more sensitive to how operating efficiency is defined.")
     # Let the user inspect one carrier's baseline DEA result in business-friendly terms.
     chosen = st.selectbox(
@@ -224,62 +295,67 @@ with benchmark:
         ranking.carrier.tolist(),
         format_func=label,
     )
+    chosen = st.selectbox(
+        "Select a carrier to inspect",
+        ranking.carrier.tolist(),
+        format_func=label,
+    )
 
     r = ranking.loc[ranking.carrier.eq(chosen)].iloc[0]
-    
-    st.subheader("Baseline carrier summary")
-    
+
+    st.subheader("Baseline carrier benchmark")
+
     col1, col2, col3 = st.columns(3)
-    
+
     col1.metric(
         "Baseline efficiency score",
         f"{float(r.efficiency):.3f}",
     )
-    
+
     # Translate the technical DEA frontier classification into simpler language.
     frontier_label = {
         "strongly_efficient": "On frontier",
         "radially_efficient_with_slack": "On frontier, with additional gaps",
         "below_frontier": "Below frontier",
     }.get(str(r.frontier_status), str(r.frontier_status))
-    
+
     col2.metric(
         "Relative position",
         frontier_label,
     )
-    
+
     col3.metric(
         "Benchmark peers",
         str(r.reference_peers),
     )
-    
+
     st.caption(
         "The efficiency score and benchmark peers shown here come from the "
         "baseline DEA model. Benchmark peers are mathematical reference points "
         "within the model, not airlines that the selected carrier should directly copy."
     )
-    
+
     # Keep the more technical DEA outputs available for users who want to inspect them.
     with st.expander("View detailed DEA results"):
         st.markdown(
             """
             **How to read these results**
-    
+
             - **Input gaps** show additional reductions in modeled inputs identified
-              after the proportional DEA adjustment.
+            after the proportional DEA adjustment.
             - **Output gaps** show additional increases in modeled outputs identified
-              by the model.
+            by the model.
             - These are mathematical benchmarking results, not direct operating
-              recommendations.
+            recommendations.
             """
         )
-    
+
         st.write("**Input gaps:**", str(r.input_slacks))
         st.write("**Output gaps:**", str(r.output_slacks))
         st.write("**Benchmark peers:**", str(r.reference_peers))
-    
+
     # Keep data-eligibility details separate from the main benchmark interpretation.
-    with st.expander("Carrier coverage and DEA eligibility"):
+with st.expander("Carrier coverage and DEA eligibility"):
     st.caption(
         "The DEA analysis uses only carriers that meet the required reporting "
         "and data-coverage criteria. This table shows which carriers are included "
@@ -315,6 +391,7 @@ with fleet:
     row = summary.loc[summary.carrier.eq(code)].iloc[0]
     total = st.columns(4)
     total[0].metric("Aircraft observed", f"{len(subset):,}")
+    total[0].metric("Aircraft observed", f"{len(subset):,}")
     total[1].metric("Domestic flights analyzed", f"{int(row.valid_domestic_legs):,}")
     total[2].metric("Median flying hours / active day", f"{row.median_tail_block_hours_per_active_day:.2f}")
     total[3].metric("Median share of active days", f"{row.median_tail_active_day_ratio:.1%}")
@@ -334,9 +411,9 @@ with fleet:
         "domestic flight history in the dataset. This filter improves comparability "
         "and does not classify aircraft as underutilized."
     )
-    
+
     if plotted.empty:
-    
+
         st.info(
             "No aircraft have sufficient observation history to be included "
             "in the default charts for this carrier.")
@@ -347,7 +424,7 @@ with fleet:
                 "block_hours_per_observed_active_day":
                     "Domestic flying hours per active day"},
             title="How intensively are observed aircraft used when active?", )
-        st.plotly_chart( fig_hours, use_container_width=True, )
+        st.plotly_chart( fig_hours, width="stretch", )
         st.caption(   "Shows the distribution of recorded domestic flying hours on days "
             "when each aircraft appears in the BTS dataset.")
         # Compare how frequently each aircraft appears with how much it flies
@@ -368,17 +445,17 @@ with fleet:
                 "observed_active_days":
                     "Days with observed domestic flights",},
             title="Aircraft activity profile",)
-    
+
         st.plotly_chart(
             fig_activity,
-            use_container_width=True,)
-    
+            width="stretch",)
+
         st.caption(
             "Aircraft toward the upper-right appear more frequently in domestic "
             "operations and record more flying hours when active. Lower activity "
             "does not necessarily imply spare capacity because other operations "
             "may not be captured in this dataset.")
-    
+
         # Detailed aircraft-level metrics for users who want to inspect
         # the underlying observations.
         with st.expander("View aircraft-level activity data"):
@@ -396,17 +473,17 @@ with fleet:
         monthly.loc[monthly.carrier.eq(code)]
         .sort_values(["year", "month"])
         .copy())
-    
+
     monthly_carrier["period"] = pd.to_datetime(
         dict(
             year=monthly_carrier.year,
             month=monthly_carrier.month,
             day=1,))
-    
+
     # Convert recorded block minutes into hours for easier interpretation.
     monthly_carrier["recorded_block_hours"] = (
         monthly_carrier["recorded_block_minutes"] / 60)
-    
+
     fig_monthly = px.line( monthly_carrier,
         x="period",
         y="recorded_block_hours",
@@ -415,11 +492,11 @@ with fleet:
             "period": "Month",
             "recorded_block_hours": "Recorded domestic flying hours",},
         title="Monthly domestic flying activity",)
-    
+
     st.plotly_chart(
         fig_monthly,
-        use_container_width=True,)
-    
+        width="stretch",)
+
     st.caption(
         "Monthly changes may reflect seasonality, network deployment, maintenance, "
         "international assignments, storage, re-registration, or data coverage. "
@@ -495,7 +572,7 @@ with insights:
 
     st.plotly_chart(
         fig,
-        use_container_width=True,
+        width="stretch",
     )
 
     st.markdown(

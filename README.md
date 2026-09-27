@@ -1,10 +1,13 @@
 # Airline Operations Intelligence: Efficiency Benchmarking & Fleet Activity Analytics
+# Airline Operations Intelligence: Efficiency Benchmarking & Fleet Activity Analytics
 
+[![tests](https://github.com/nicholehoyc-sys/airline_operations_intelligence/actions/workflows/tests.yml/badge.svg)](https://github.com/nicholehoyc-sys/airline_operations_intelligence/actions/workflows/tests.yml)
 [![tests](https://github.com/nicholehoyc-sys/airline_operations_intelligence/actions/workflows/tests.yml/badge.svg)](https://github.com/nicholehoyc-sys/airline_operations_intelligence/actions/workflows/tests.yml)
 
 A Python analytics project using **12 months of U.S. domestic airline flight records (August 2025–July 2026)** to benchmark airline operating efficiency with the **Charnes–Cooper–Rhodes (CCR) Data Envelopment Analysis** model.
+A Python analytics project using **12 months of U.S. domestic airline flight records (August 2025–July 2026)** to benchmark airline operating efficiency with the **Charnes–Cooper–Rhodes (CCR) Data Envelopment Analysis** model.
 
-The project combines carrier-level efficiency benchmarking, aircraft-level utilization metrics and sensitivity analysis to examine how different airline operating models turn observed fleet resources into flight activity and service outcomes. An interactive Streamlit dashboard lets users compare carriers, explore aircraft activity patterns, test how sensitive the efficiency results are to different modeling assumptions, and investigate differences in operating performance.
+The project combines carrier-level efficiency benchmarking, aircraft-level activity metrics and sensitivity analysis to examine how different airline operating models turn observed fleet resources into flight activity and service outcomes. An interactive Streamlit dashboard lets users compare carriers, explore aircraft activity patterns, test how sensitive the efficiency results are to different modeling assumptions, and investigate differences in operating performance.
 
 ![DEA benchmarking tab](docs/img/dea_benchmarking.png)
 
@@ -14,7 +17,7 @@ The project combines carrier-level efficiency benchmarking, aircraft-level utili
 |---|---|
 | Source | U.S. Bureau of Transportation Statistics (BTS), *Reporting Carrier On-Time Performance*: 12 monthly archives |
 | Period | 1 Aug 2025 – 31 Jul 2026 (last twelve months to July 2026) |
-| Scale | 7,043,858 scheduled flight records · 6,915,477 non-cancelled flights · 14 reporting carriers · 6,390 observed aircraft records (unique carrier–tail pairs) |
+| Scale | 7,043,858 scheduled flight records · 6,915,477 non-cancelled flights · 14 reporting carriers · 6,390 observed aircraft records (unique carrier-tail pairs) |
 | DEA peer set | 12 carriers with 12 active reporting months and ≥10,000 flights (HA and NK are excluded because they have fewer than 12 reporting months) |
 | Model | Input-oriented CCR (constant returns to scale), two-stage: radial score, then max-slack; solved with SciPy HiGHS |
 | Sensitivity | 4 input/output specifications, shown side by side |
@@ -25,6 +28,7 @@ The project combines carrier-level efficiency benchmarking, aircraft-level utili
 
 - **Southwest (WN) and Envoy (MQ) form the efficient frontier** (score 1.00, zero slack). Every other carrier's reference peers are drawn from these two.
 - **Regional carriers score high.** Republic (0.97), PSA (0.93) and SkyWest (0.92) fly short, frequent sectors, so they produce ~1,500–1,660 flights per observed aircraft, compared with ~720–1,010 at the network majors.
+- **Network majors score lower under the baseline model** (DL 0.67, AA 0.58, UA 0.50). Because the model counts flights rather than seats or distance, carriers operating longer average missions or larger-capacity aircraft can appear less favorable under a flight-frequency benchmark. The `block_hours_exposure` specification narrows part of this gap (UA 0.50 → 0.68).
 - **Network majors score lower under the baseline model** (DL 0.67, AA 0.58, UA 0.50). Because the model counts flights rather than seats or distance, carriers operating longer average missions or larger-capacity aircraft can appear less favorable under a flight-frequency benchmark. The `block_hours_exposure` specification narrows part of this gap (UA 0.50 → 0.68).
 - **Results depend on the specification.** Allegiant (G4) scores 0.55 when destinations are an input but 0.999 when network breadth is treated as an output. Its wide, thin network is a cost under one assumption and a product under the other.
 
@@ -51,9 +55,26 @@ The dashboard runs straight away on the checked-in `results/ltm_2026/` snapshot;
 
 1. **Efficiency benchmark:** efficiency scores under each specification, a cross-specification sensitivity table, and per-carrier slacks (in original units) and reference peers.
 2. **Fleet activity:** per-carrier histograms and scatterplots of block hours per active day and active-day ratio for each tail, a aircraft-level table, and monthly domestic flying-hour trends.
+2. **Fleet activity:** per-carrier histograms and scatterplots of block hours per active day and active-day ratio for each tail, a aircraft-level table, and monthly domestic flying-hour trends.
 3. **Carrier comparisons:** a configurable carrier-level scatter covering scale, network breadth, flights per aircraft, block hours, on-time rate and cancellation rate.
 
-![Fleet activity tab](docs/img/fleet_activity.png)
+### Fleet activity
+
+The fleet activity view explores how frequently observed aircraft appear in
+domestic operations and how much flying time they record when active.
+
+![Fleet activity overview](docs/img/fleet_activity_overview.png)
+
+The aircraft-level activity profile compares observation frequency with flying
+intensity across individual aircraft.
+
+![Aircraft activity profile](docs/img/fleet_activity_profile.png)
+
+Monthly trends show how recorded domestic flying activity changes over the
+12-month reporting period.
+
+![Monthly fleet activity](docs/img/fleet_activity_monthly.png)
+
 ![Carrier comparisons tab](docs/img/strategic_comparisons.png)
 
 ## Architecture
