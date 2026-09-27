@@ -125,10 +125,7 @@ for frame in (carrier, ranking, sensitivity, summary):
 
 stats = st.columns(4)
 stats[0].metric("Scheduled flights", f"{manifest['scheduled_rows']:,}")
-stats[0].metric("Scheduled flights", f"{manifest['scheduled_rows']:,}")
 stats[1].metric("Flights operated", f"{manifest['operated_rows']:,}")
-stats[2].metric("Carriers in dataset / DEA benchmark", f"{manifest['carrier_count']} / {manifest['dea_eligible_carriers']}")
-stats[3].metric("Observed aircraft records", f"{len(aircraft):,}")
 stats[2].metric("Carriers in dataset / DEA benchmark", f"{manifest['carrier_count']} / {manifest['dea_eligible_carriers']}")
 stats[3].metric("Observed aircraft records", f"{len(aircraft):,}")
 
@@ -295,11 +292,7 @@ with benchmark:
         ranking.carrier.tolist(),
         format_func=label,
     )
-    chosen = st.selectbox(
-        "Select a carrier to inspect",
-        ranking.carrier.tolist(),
-        format_func=label,
-    )
+    
 
     r = ranking.loc[ranking.carrier.eq(chosen)].iloc[0]
 
