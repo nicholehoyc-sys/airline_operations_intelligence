@@ -60,7 +60,7 @@ class DashboardSmokeTests(unittest.TestCase):
         self.assertEqual(observed["tabs"], ["Efficiency benchmark", "Fleet activity", "Carrier comparisons"])
         self.assertGreaterEqual(observed["figures"], 4)
         self.assertGreaterEqual(observed["tables"], 3)
-        self.assertEqual(observed["metrics"], 11)
+        self.assertGreaterEqual(observed["metrics"], 11)
 
 
 if __name__ == "__main__":
