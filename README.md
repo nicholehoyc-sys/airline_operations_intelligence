@@ -52,7 +52,7 @@ streamlit run dashboard/app.py
 The dashboard runs straight away on the checked-in `results/ltm_2026/` snapshot; you don't need to download the ~360 MB of raw archives.
 
 1. **Efficiency benchmark:** efficiency scores under each specification, a cross-specification sensitivity table, and per-carrier slacks (in original units) and reference peers.
-2. **Fleet activity:** per-carrier histograms and scatterplots of block hours per active day and active-day ratio for each tail, a aircraft-level table, and monthly domestic flying-hour trends.
+2. **Fleet activity:** per-carrier histograms and scatterplots of block hours per active day and active-day ratio for each tail, an aircraft-level table, and monthly domestic flying-hour trends.
 3. **Carrier comparisons:** a configurable carrier-level scatter covering scale, network breadth, flights per aircraft, block hours, on-time rate and cancellation rate.
 
 ### Fleet activity
